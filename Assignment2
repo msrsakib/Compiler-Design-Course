@@ -1,0 +1,185 @@
+import java.util.Scanner;
+
+public class NewClass
+{	
+	private static Scanner scanner = new Scanner(System.in);;
+	
+	static String var = "";
+	static double[] val = new double[100];
+	static String[] eq = new String[100];
+	static double[] ans = new double[100];
+	
+	static int Op_Precedance(char op)
+	{
+		int precedance = 0;
+		
+		if (op == '+' || op == '-')
+		{
+			precedance = 5;
+		}
+		else if (op == '*' || op == '/')
+		{
+			precedance = 6;
+		}
+		
+		return precedance;
+	}
+	
+	
+	static String infToPost(String inf)
+	{
+		
+		String stack = "", post = "";
+		int i = 0, top = -1;
+		
+		
+		for (i = 0; i < inf.length(); i++)
+		{
+			if(inf.charAt(i) >= 'A' && inf.charAt(i) <= 'Z' || inf.charAt(i) >= 'a' && inf.charAt(i) <= 'z')
+			{
+				post = post+inf.charAt(i);
+			}
+			else if(inf.charAt(i) == ' ')
+				continue;
+			else
+			{
+				
+				if (top == -1 || Op_Precedance(inf.charAt(i)) > Op_Precedance(stack.charAt(top)))
+				{
+					top++;
+                                    stack = new StringBuilder(stack).insert(top, inf.charAt(i)).toString();
+				}
+				else
+				{
+					post = post+stack.charAt(top);
+					top--;
+					i--;
+				}
+			}
+			
+		}
+		
+		for ( ; top > -1; top--)
+		{
+			post = post+stack.charAt(top);
+		}
+		
+		return post;		
+	}
+	
+	public static double Calculate(double num1, char operator, double num2)
+	{
+		double ans = 0;
+		
+		switch (operator)
+		{
+		case '+':
+			ans = num1+num2;
+			break;
+		case '-':
+			ans = num1-num2;
+			break;
+		case '*':
+			ans = num1*num2;
+			break;
+		case '/':
+			ans = num1/num2;
+			break;
+		default:
+			break;
+		}
+		
+		return ans;
+	}
+	
+	public static double gettingValue(char variable)
+	{
+		double value = 0;
+		for (int i = 0; i < var.length(); i++)
+		{
+			if (var.charAt(i) == variable)
+			{
+				return val[i];
+			}
+		}
+		
+		return value;
+
+	}
+	
+	public static double CalculateSorolOnko(String seq)
+	{
+		String postseq = infToPost(seq);
+		double ans = 0;
+		double[] stack = new double[100];
+		int top = -1;
+	
+		for (int i = 0; i < postseq.length(); i++)
+		{
+			if(postseq.charAt(i) >= 'A' && postseq.charAt(i) <= 'Z' || postseq.charAt(i) >= 'a' && postseq.charAt(i) <= 'z')
+			{
+				stack[++top] = gettingValue(postseq.charAt(i));
+			}
+			else if(postseq.charAt(i) == ' ')
+				continue;
+			else
+			{
+				stack[top-1] = Calculate(stack[top-1], postseq.charAt(i), stack[top]);
+				top--;
+			}
+		}
+		
+		if (top == 0)
+		{
+			ans = stack[top];
+		}
+		
+		
+		return ans;
+	}
+
+	public static void main(String[] args)
+	{
+		System.out.print("Number Of Variables:  ");
+		int NumberOfVariables = scanner.nextInt();
+		
+		int i;
+		
+		
+		System.out.println("Enter Variable Names(One Letter):");
+		for (i = 0; i <= NumberOfVariables; i++)
+		{
+			var = var + scanner.nextLine();
+		}
+		
+		System.out.println("Enter Values:");
+		for (i = 0; i < NumberOfVariables; i++)
+		{
+			System.out.print(var.charAt(i)+" = ");
+			val[i] = scanner.nextDouble();
+		}
+		
+		
+		System.out.print("Number Of Equations:  ");
+		int NumberOfEquation = scanner.nextInt();
+		
+		
+		System.out.println("Enter Equations:");
+		for (i = 0; i <= NumberOfEquation; i++)
+		{
+			if(i!=0)
+				System.out.print((i)+". ");
+			eq[i] = scanner.nextLine();
+		}
+		
+		
+		
+		for (i = 1; i <= NumberOfEquation; i++) {
+			ans[i] = CalculateSorolOnko(eq[i]);
+		}
+		
+		for (i = 1; i <= NumberOfEquation; i++) {
+			System.out.println("Answer Of Equation "+(i)+" = "+ans[i]);
+		}
+	}
+}
